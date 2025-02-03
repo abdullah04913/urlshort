@@ -1,0 +1,102 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8"></meta>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+  <title>URL Shortener</title>
+  <style>
+    /* Style for the button */
+    .styled-button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    /* Style for the input */
+    #urlInput {
+      width: 300px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    /* Style for the copy link button */
+    #copyLinkButton {
+      background-color: #008CBA;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 10px 2px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+
+  <label for="urlInput">Enter URL:</label>
+  <input id="urlInput" type="text" />
+
+  <button class="styled-button" onclick="shortenUrl()">Shorten URL</button>
+
+  <div id="shortenedUrl"></div>
+
+  <button id="copyLinkButton" onclick="copyShortenedUrl()">Copy Link</button>
+
+  <script>
+    async function shortenUrl() {
+      let inputElement = document.getElementById("urlInput");
+      let url = inputElement.value.trim();
+      if (!url) {
+        alert("Please enter a URL.");
+        return;
+      }
+      try {
+        let response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+        let shortenedUrl = await response.text();
+        displayShortenedUrl(shortenedUrl);
+      } catch (error) {
+        console.error(error);
+        alert("An error occurred while shortening the URL. Please try again.");
+      }
+    }
+
+    function displayShortenedUrl(shortenedUrl) {
+      let shortenedUrlElement = document.getElementById("shortenedUrl");
+      shortenedUrlElement.innerHTML = "";
+      let pElement = document.createElement("p");
+      pElement.textContent = `Shortened URL: ${shortenedUrl}`;
+      shortenedUrlElement.appendChild(pElement);
+      // Update the global variable holding the shortened URL
+      window.shortenedUrl = shortenedUrl;
+    }
+
+    function copyShortenedUrl() {
+      if (!window.shortenedUrl) {
+        alert("No shortened URL available to copy.");
+        return;
+      }
+      navigator.clipboard.writeText(window.shortenedUrl)
+        .then(() => {
+          alert("Shortened URL copied to clipboard.");
+        })
+        .catch(err => {
+          console.error('Error copying text: ', err);
+          alert("Failed to copy shortened URL.");
+        });
+    }
+  </script>
+</body>
+</html>
